@@ -6,11 +6,14 @@ class Application:
     def __call__(self, environ, start_response):
 
         path = environ['PATH_INFO']
+        request = {
+            'PATH_INFO': path
+        }
+        for controller in self.fronts:
+            controller(request)
+        path = request['PATH_INFO']
         if path in self.urls:
             view = self.urls[path]
-            request = {}
-            for controller in self.fronts:
-                controller(request)
             code, text = view(request)
             start_response(code, [('Contrnt-Type', 'text/html')])
             return [text.encode('utf-8')]
