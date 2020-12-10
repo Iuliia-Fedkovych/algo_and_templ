@@ -8,3 +8,15 @@ def index_view(request):
 
 def about_view(request):
     return '200 OK', render('about.html')
+
+
+def contact_view(request):
+    if request['method'] == 'POST':
+        data = request['data']
+        title = data['title']
+        content = data['content']
+        email = data['email']
+        print(f'You get e-mail from {email}, with title "{title}" and content {content}')
+        return '200 OK', render('contact.html')
+    else:
+        return '200 OK', render('contact.html')
