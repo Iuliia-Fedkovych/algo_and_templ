@@ -1,0 +1,1 @@
+You get e-mail from some_email%40mail.ru, with title "hello" and content My+name+is+Julia

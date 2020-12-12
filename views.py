@@ -16,7 +16,8 @@ def contact_view(request):
         title = data['title']
         content = data['content']
         email = data['email']
-        print(f'You get e-mail from {email}, with title "{title}" and content {content}')
+        with open("message.txt", 'w', encoding='utf-8') as f:
+            f.write(f'You get e-mail from {email}, with title "{title}" and content {content}')
         return '200 OK', render('contact.html')
     else:
         return '200 OK', render('contact.html')
