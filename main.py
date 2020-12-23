@@ -1,4 +1,4 @@
-from framework import Application, render
+from framework import Application, render, MockApplication, DebugApplication
 from models import TrainingSite
 from logging_mod import Logger, debug
 
@@ -8,8 +8,7 @@ logger = Logger('main')
 
 
 def main_view(request):
-    # logger.log('Список курсов')
-    return '200 OK', render('index.html', objects_list=site.courses)
+    return '200 OK', render('index.html', objects_list=site.categories)
 
 
 @debug
@@ -32,19 +31,22 @@ def create_course(request):
 
 
 def create_category(request):
+    categories = site.categories
     if request['method'] == 'POST':
         data = request['data']
         print(data)
         name = data['name']
+        category_id = data.get('category_id')
 
         category = None
+        if category_id:
+            category = site.find_category_by_id(int(category_id))
 
         new_category = site.create_category(name, category)
         site.categories.append(new_category)
 
-        return '200 OK', render('create_category.html')
+        return '200 OK', render('create_category.html', categories=categories)
     else:
-        categories = site.categories
         return '200 OK', render('create_category.html', categories=categories)
 
 
@@ -61,4 +63,10 @@ def secret_front(request):
 
 front_controllers = [secret_front]
 
-application = Application(urls, front_controllers)
+application = DebugApplication(urls, front_controllers)
+
+
+@application.add_route('/course-list/')
+def category_list(request):
+    logger.log('Список курсов')
+    return '200 OK', render('course_list.html', objects_list=site.courses)

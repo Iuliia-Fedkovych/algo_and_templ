@@ -4,7 +4,7 @@
     <h2>Создание категории</h2>
         <form method="post">
             <input type="text" name="name" placeholder="название">
-            <select size="3" name="category_id">
+            <select size="5" name="category_id">
                 {% for item in categories %}
                 <option value="{{item.id}}">{{item.name}}</option>
                 {% endfor %}

@@ -93,7 +93,6 @@ class TrainingSite:
                 return item
         raise Exception(f'Нет категории с id = {id}')
 
-
     def create_course(self, type_, name, category):
         return CourseFactory.create(type_, name, category)
 

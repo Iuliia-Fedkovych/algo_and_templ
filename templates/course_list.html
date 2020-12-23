@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Список курсов по творчеству</h1>
+    <ul>
+        {% for item in objects_list %}
+        <li>
+            {{item.name}}
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
