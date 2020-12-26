@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block main %}
     <h1>Онлайн курсы по творчеству</h1>
-    <h3>secret: {{secret}}</h3>
+    <ul>
+        {% for item in objects_list %}
+        <li>
+            {{item.name}}
+        </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
