@@ -1,10 +1,12 @@
-from framework import Application, render, MockApplication, DebugApplication
-from models import TrainingSite
+from framework import Application, render, MockApplication, DebugApplication, ListView, CreateView
+from models import TrainingSite, EmailNotifier, SmsNotifier, BaseSerializer
 from logging_mod import Logger, debug
 
 
 site = TrainingSite()
 logger = Logger('main')
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
 
 
 def main_view(request):
@@ -23,6 +25,8 @@ def create_course(request):
             category = site.find_category_by_id(int(category_id))
 
             course = site.create_course('record', name, category)
+            course.observers.append(email_notifier)
+            course.observers.append(sms_notifier)
             site.courses.append(course)
 
         return '200 OK', render('create_course.html', categories=categories)
@@ -30,11 +34,15 @@ def create_course(request):
         return '200 OK', render('create_course.html', categories=categories)
 
 
-def create_category(request):
-    categories = site.categories
-    if request['method'] == 'POST':
-        data = request['data']
-        print(data)
+class CategoryCreateView(CreateView):
+    template_name = 'create_category.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['categories'] = site.categories
+        return context
+
+    def create_obj(self, data: dict):
         name = data['name']
         category_id = data.get('category_id')
 
@@ -45,15 +53,71 @@ def create_category(request):
         new_category = site.create_category(name, category)
         site.categories.append(new_category)
 
-        return '200 OK', render('create_category.html', categories=categories)
-    else:
-        return '200 OK', render('create_category.html', categories=categories)
+
+# def create_category(request):
+#     categories = site.categories
+#     if request['method'] == 'POST':
+#         data = request['data']
+#         print(data)
+#         name = data['name']
+#         category_id = data.get('category_id')
+#
+#         category = None
+#         if category_id:
+#             category = site.find_category_by_id(int(category_id))
+#
+#         new_category = site.create_category(name, category)
+#         site.categories.append(new_category)
+#
+#         return '200 OK', render('create_category.html', categories=categories)
+#     else:
+#         return '200 OK', render('create_category.html', categories=categories)
+
+
+class CourseListView(ListView):
+    queryset = site.courses
+    template_name = 'course_list.html'
+
+
+class StudentListView(ListView):
+    queryset = site.students
+    template_name = 'student_list.html'
+
+
+class StudentCreateView(CreateView):
+    template_name = 'create_student.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        new_obj = site.create_user('student', name)
+        site.students.append(new_obj)
+
+
+class AddStudentByCourseCreateView(CreateView):
+    template_name = 'add_student.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['courses'] = site.courses
+        context['students'] = site.students
+        return context
+
+    def create_obj(self, data: dict):
+        course_name = data['course_name']
+        course = site.get_course(course_name)
+        student_name = data['student_name']
+        student = site.get_student(student_name)
+        course.add_student(student)
 
 
 urls = {
     '/': main_view,
     '/create-course/': create_course,
-    '/create-category/': create_category,
+    '/create-category/': CategoryCreateView(),
+    '/course-list/': CourseListView(),
+    '/create-student/': StudentCreateView(),
+    '/student-list/': StudentListView(),
+    '/add-student/': AddStudentByCourseCreateView()
 }
 
 
@@ -63,10 +127,14 @@ def secret_front(request):
 
 front_controllers = [secret_front]
 
-application = DebugApplication(urls, front_controllers)
+application = Application(urls, front_controllers)
 
 
-@application.add_route('/course-list/')
-def category_list(request):
-    logger.log('Список курсов')
-    return '200 OK', render('course_list.html', objects_list=site.courses)
+# @application.add_route('/course-list/')
+# def category_list(request):
+#     logger.log('Список курсов')
+#     return '200 OK', render('course_list.html', objects_list=site.courses)
+
+@application.add_route('/api/')
+def course_api(request):
+    return '200 OK', BaseSerializer(site.courses).save()
