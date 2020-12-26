@@ -90,21 +90,21 @@ class StudentCreateView(CreateView):
         site.students.append(new_obj)
 
 
-# class AddStudentByCourseCreateView(CreateView):
-#     template_name = 'create_student.html'
-#
-#     def get_context_data(self):
-#         context = super().get_context_data()
-#         context['courses'] = site.courses
-#         context['students'] = site.students
-#         return context
-#
-#     def create_obj(self, data: dict):
-#         course_name = data['course_name']
-#         course = site.get_course(course_name)
-#         student_name = data['student_name']
-#         student = site.get_student(student_name)
-#         course.add_student(student)
+class AddStudentByCourseCreateView(CreateView):
+    template_name = 'add_student.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['courses'] = site.courses
+        context['students'] = site.students
+        return context
+
+    def create_obj(self, data: dict):
+        course_name = data['course_name']
+        course = site.get_course(course_name)
+        student_name = data['student_name']
+        student = site.get_student(student_name)
+        course.add_student(student)
 
 
 urls = {
@@ -113,7 +113,8 @@ urls = {
     '/create-category/': CategoryCreateView(),
     '/course-list/': CourseListView(),
     '/create-student/': StudentCreateView(),
-    '/student-list/': StudentListView()
+    '/student-list/': StudentListView(),
+    '/add-student/': AddStudentByCourseCreateView()
 }
 
 

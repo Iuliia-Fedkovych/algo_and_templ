@@ -12,7 +12,7 @@ class Tutor(User):
 
 class Student(User):
     def __init__(self, name):
-        self.course = []
+        self.courses = []
         super().__init__(name)
 
 
@@ -50,6 +50,19 @@ class Course(PrototypeMixin):
         self.name = name
         self.category = category
         self.category.courses.append(self)
+        self.students = []
+        super().__init__()
+
+    def __getitem__(self, item):
+        return self.students[item]
+
+    def add_student(self, student: Student):
+        self.students.append(student)
+        student.courses.append(self)
+
+    def student_count(self):
+        result = len(self.students)
+        return result
 
 
 class WebinarCourse(Course):

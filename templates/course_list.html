@@ -4,7 +4,7 @@
     <ul>
         {% for item in objects_list %}
         <li>
-            {{item.name}}
+            {{item.name}}<span>({{item.student_count()}})</span>
         </li>
         {% endfor %}
     </ul>
