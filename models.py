@@ -2,7 +2,8 @@ from reusepatterns.prototypes import PrototypeMixin
 
 
 class User:
-    pass
+    def __init__(self, name):
+        self.name = name
 
 
 class Tutor(User):
@@ -10,7 +11,9 @@ class Tutor(User):
 
 
 class Student(User):
-    pass
+    def __init__(self, name):
+        self.course = []
+        super().__init__(name)
 
 
 class UserFactory:
@@ -20,8 +23,8 @@ class UserFactory:
     }
 
     @classmethod
-    def create(cls, type_):
-        return cls.types[type_]()
+    def create(cls, type_, name):
+        return cls.types[type_](name)
 
 
 class Category:
@@ -80,8 +83,8 @@ class TrainingSite:
         self.courses = []
         self.categories = []
 
-    def create_user(self, type_):
-        return UserFactory.create(type_)
+    def create_user(self, type_, name):
+        return UserFactory.create(type_, name)
 
     def create_category(self, name, category=None):
         return Category(name, category)
@@ -100,4 +103,8 @@ class TrainingSite:
         for item in self.courses:
             if item.name == name:
                 return item
-        return None
+
+    def get_student(self, name) -> Student:
+        for item in self.students:
+            if item.name == name:
+                return item
