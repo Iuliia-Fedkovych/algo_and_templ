@@ -1,4 +1,5 @@
 from reusepatterns.prototypes import PrototypeMixin
+from reusepatterns.observer import Observer, Subject
 
 
 class User:
@@ -44,7 +45,7 @@ class Category:
         return result
 
 
-class Course(PrototypeMixin):
+class Course(PrototypeMixin, Subject):
 
     def __init__(self, name, category):
         self.name = name
@@ -59,10 +60,24 @@ class Course(PrototypeMixin):
     def add_student(self, student: Student):
         self.students.append(student)
         student.courses.append(self)
+        self.notify()
 
     def student_count(self):
         result = len(self.students)
         return result
+
+
+class SmsNotifier(Observer):
+
+    def update(self, subject: Course):
+        print('SMS->', 'к нам присоединился', subject.students[-1].name)
+
+
+class EmailNotifier(Observer):
+
+    def update(self, subject: Course):
+        print(('EMAIL->', 'к нам присоединился', subject.students[-1].name))
+
 
 
 class WebinarCourse(Course):

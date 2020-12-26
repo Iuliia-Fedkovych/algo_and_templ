@@ -1,11 +1,13 @@
 from framework import Application, render, MockApplication, DebugApplication, ListView, CreateView
-from models import TrainingSite
+from models import TrainingSite, EmailNotifier, SmsNotifier
 from logging_mod import Logger, debug
 
 
 
 site = TrainingSite()
 logger = Logger('main')
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
 
 
 def main_view(request):
@@ -24,6 +26,8 @@ def create_course(request):
             category = site.find_category_by_id(int(category_id))
 
             course = site.create_course('record', name, category)
+            course.observers.append(email_notifier)
+            course.observers.append(sms_notifier)
             site.courses.append(course)
 
         return '200 OK', render('create_course.html', categories=categories)
