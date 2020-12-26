@@ -1,7 +1,6 @@
 from framework import Application, render, MockApplication, DebugApplication, ListView, CreateView
-from models import TrainingSite, EmailNotifier, SmsNotifier
+from models import TrainingSite, EmailNotifier, SmsNotifier, BaseSerializer
 from logging_mod import Logger, debug
-
 
 
 site = TrainingSite()
@@ -135,3 +134,7 @@ application = Application(urls, front_controllers)
 # def category_list(request):
 #     logger.log('Список курсов')
 #     return '200 OK', render('course_list.html', objects_list=site.courses)
+
+@application.add_route('/api/')
+def course_api(request):
+    return '200 OK', BaseSerializer(site.courses).save()
